@@ -1,6 +1,16 @@
+def mul(x, y):
+	return x*y
+
+def mul(x, y):
+	return x*y
+
+def sum(x, y):
+	return x+y
+	
+
 def sub(x, y):
 	return x-y
-	
+
 def swapBytes(x):
 	# 0x AA BB CC DD -> DD CC BB AA
 	# 1 byte is shift of 8
@@ -13,9 +23,9 @@ def swapBytes(x):
 # adding a comment here for test :)
 def main():
 	x = 0xAABBCCDD
-	print("%.8x" % x)
+	print("Little Endian: 0x%.8X" % x)
 	x = swapBytes(x)
-	print("%.8x" % x)
+	print("   Big Endian: 0x%.8X" % x)
 	return
 
 if __name__ == "__main__":
