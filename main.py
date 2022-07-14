@@ -7,7 +7,7 @@ def swapBytes(x):
 	y4 = (x >> 24) & 0x000000FF
 	y = y1 | y2 | y3 | y4
 	return y
-
+# adding a comment here for test :)
 def main():
 	x = 0xAABBCCDD
 	print("%.8x" % x)
