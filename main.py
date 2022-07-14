@@ -16,11 +16,13 @@ class ANIM:
 
 
 class ANIM_0xC8(ANIM):
-	def __int__(self):
+	def __int__(self, start, end):
+		ANIM.__init__(self, start, end)
 		return
 
 class ANIM_0x64(ANIM):
-	def __int__(self):
+	def __int__(self, start, end):
+		ANIM.__init__(self, start, end)
 		return
 		
 
@@ -33,6 +35,7 @@ class MOTA:
 		self.num_of_anims = readInt(start+16)
 		self.endian = "little" if readInt(start+4) == 1 else "big"
 		self.headers = [None] * self.num_of_anims
+		self.anims = [None] * self.num_of_anims
 		self.readHeaders()
 		return
 	
@@ -49,6 +52,13 @@ class MOTA:
 			start = self.headers[i]
 			try: end = self.headers[i+1]
 			except Exception: end = self.end_addr
+			signatureByte = readInt(start)
+			if signatureByte == 0xC8:
+				self.anim[i] = ANIM_0xC8(start, end)
+			elif signatureByte == 0x64:
+				self.anim[i] = ANIM_0x64(start, end)
+			else:
+				print("Invalid Anim Byte for anim # %d" % (i+1))
 		return
 
 def swapBytes(x):
