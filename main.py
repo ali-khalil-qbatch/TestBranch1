@@ -1,4 +1,5 @@
 def printMyName():
+	print("Ali Khalil")
 	print("ALI KHALIL")
 	return
 
