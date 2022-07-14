@@ -1,13 +1,22 @@
-def readInt(addr):
+def readInt(addr, endian):
 	return 0
 
+# Just Practising
 # Motion Binary Class
 class MOTA:
 	def __int__(self, start, end):
 		self.start_addr = start
 		self.end_addr = end
 		self.num_of_anims = readInt(start+16)
-		
+		self.endian = "little" if readInt(start+4) == 1 else "big"
+		self.headers = [None] * self.num_of_anims
+		self.readHeaders()
+		return
+	
+	def readHeaders(self):
+		start = self.start_addr
+		for i in range(self.num_of_anims):
+			self.headers[i] = readInt(start + 20 + i * 4) + start
 		return
 
 def swapBytes(x):
