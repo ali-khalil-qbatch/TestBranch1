@@ -10,11 +10,14 @@ class ANIM:
 		self.start_end = end
 		self.type = 0
 		self.bones = 0
+		self.frames = 0
 		self.descriptors = []
 		self.bytes = []
 		return
 
 	def readData(self):
+		self.type = readInt(self.start_addr)
+		self.bones = readInt(self.start_addr+2)
 		return
 
 
@@ -23,9 +26,42 @@ class ANIM_0xC8(ANIM):
 		super().__init__(self, start, end)
 		return
 
+	def readData(self):
+		self.type = readInt(self.start_addr)
+		self.bones = readInt(self.start_addr+2)
+		self.frames = readInt(self.start_addr+4)
+		
+		for i in range(self.bones):
+			self.descriptors[i] = readInt(self.start_addr + 8 + i * 4)
+
+		addr = self.start_addr + self.bones * 2 + 4
+		i = 0
+		while (addr < self.end):
+			self.bytes[i] = readFloat(addr)
+			i += 1
+			addr += 4
+		return
+
 class ANIM_0x64(ANIM):
 	def __int__(self, start, end):
 		super().__init__(self, start, end)
+		return
+
+	def readData(self):
+		self.type = readInt(self.start_addr)
+		self.bones = readInt(self.start_addr+2)
+
+		for i in range(self.bones):
+			self.descriptors[i] = readInt(self.start_addr + 4 + i * 4)
+
+		self.frames = self.start_addr + self.bones * 4 + 4
+
+		addr = self.start_addr + self.bones * 2 + 4
+		i = 0
+		while (addr < self.end):
+			self.bytes[i] = readFloat(addr)
+			i += 1
+			addr += 4
 		return
 		
 
@@ -58,8 +94,10 @@ class MOTA:
 			signatureByte = readInt(start)
 			if signatureByte == 0xC8:
 				self.anim[i] = ANIM_0xC8(start, end)
+				self.anim[i].readData()
 			elif signatureByte == 0x64:
 				self.anim[i] = ANIM_0x64(start, end)
+				self.anim[i].readData()
 			else:
 				print("Invalid Anim Byte for anim # %d. Skipping this" % (i+1))
 				self.anim[i] = None
