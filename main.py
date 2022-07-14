@@ -14,15 +14,18 @@ class ANIM:
 		self.bytes = []
 		return
 
+	def readData(self):
+		return
+
 
 class ANIM_0xC8(ANIM):
 	def __int__(self, start, end):
-		ANIM.__init__(self, start, end)
+		super().__init__(self, start, end)
 		return
 
 class ANIM_0x64(ANIM):
 	def __int__(self, start, end):
-		ANIM.__init__(self, start, end)
+		super().__init__(self, start, end)
 		return
 		
 
@@ -58,7 +61,8 @@ class MOTA:
 			elif signatureByte == 0x64:
 				self.anim[i] = ANIM_0x64(start, end)
 			else:
-				print("Invalid Anim Byte for anim # %d" % (i+1))
+				print("Invalid Anim Byte for anim # %d. Skipping this" % (i+1))
+				self.anim[i] = None
 		return
 
 def swapBytes(x):
