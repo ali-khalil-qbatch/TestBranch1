@@ -1,6 +1,24 @@
 def readInt(addr, endian):
 	return 0
 
+class ANIM:
+	def __int__(self):
+		self.type = 0
+		self.bones = 0
+		self.descriptors = []
+		self.bytes = []
+		return
+
+
+class ANIM_0xC8(ANIM):
+	def __int__(self):
+		return
+
+class ANIM_0x64(ANIM):
+	def __int__(self):
+		return
+		
+
 # Just Practising
 # Motion Binary Class
 class MOTA:
@@ -17,6 +35,10 @@ class MOTA:
 		start = self.start_addr
 		for i in range(self.num_of_anims):
 			self.headers[i] = readInt(start + 20 + i * 4) + start
+		return
+
+	def readAnims(self):
+		
 		return
 
 def swapBytes(x):
