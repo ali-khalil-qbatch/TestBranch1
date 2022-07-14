@@ -1,8 +1,13 @@
-def readInt(addr, endian):
+def readInt(addr, endian='little'):
+	return 0
+
+def readFloat(addr, endian='little'):
 	return 0
 
 class ANIM:
-	def __int__(self):
+	def __int__(self, start, end):
+		self.start_addr = start
+		self.start_end = end
 		self.type = 0
 		self.bones = 0
 		self.descriptors = []
@@ -38,7 +43,12 @@ class MOTA:
 		return
 
 	def readAnims(self):
-		
+		start = 0
+		end = 0
+		for i in range(self.num_of_anims):
+			start = self.headers[i]
+			try: end = self.headers[i+1]
+			except Exception: end = self.end_addr
 		return
 
 def swapBytes(x):
