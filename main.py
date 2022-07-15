@@ -1,8 +1,42 @@
-def readInt(addr, endian='little'):
-	return 0
+# File Descriptor
+import re
+import struct
 
-def readFloat(addr, endian='little'):
-	return 0
+
+fd = None
+
+def read(addr=0, size=4, endian='little'):
+	if size != 2 and size !=4 and size != 8: return 0
+	fptr = fd.tell()
+	if (addr != 0):
+		fd.seek(addr)
+	try:
+		val = int.from_bytes(fd.read(size), endian)
+	except Exception:
+		val = 0
+	fd.seek(fptr) # Restore File Pointer
+	return val
+
+def readInt64(addr=0, endian='little'):
+	return read(addr, 8, endian)
+
+def readInt32(addr=0, endian='little'):
+	return read(addr, 4, endian)
+
+def readInt16(addr=0, endian='little'):
+	return read(addr, 2, endian)
+
+def readFloat(addr=0, endian='little'):
+	fptr = fd.tell()
+	if (addr != 0):
+		fd.seek(addr)
+	str = "f" if endian == "little" else ">f"
+	try:
+		val = struct.unpack(str, fd.read(4))
+	except Exception:
+		val = 0
+	fd.seek(fptr) # Restore File Pointer
+	return val
 
 class ANIM:
 	def __int__(self, start, end):
@@ -16,8 +50,8 @@ class ANIM:
 		return
 
 	def readData(self):
-		self.type = readInt(self.start_addr)
-		self.bones = readInt(self.start_addr+2)
+		self.type = readInt16(self.start_addr)
+		self.bones = readInt16(self.start_addr+2)
 		return
 
 
@@ -27,12 +61,12 @@ class ANIM_0xC8(ANIM):
 		return
 
 	def readData(self):
-		self.type = readInt(self.start_addr)
-		self.bones = readInt(self.start_addr+2)
-		self.frames = readInt(self.start_addr+4)
+		self.type = readInt16(self.start_addr)
+		self.bones = readInt16(self.start_addr+2)
+		self.frames = readInt32(self.start_addr+4)
 		
 		for i in range(self.bones):
-			self.descriptors[i] = readInt(self.start_addr + 8 + i * 4)
+			self.descriptors[i] = readInt32(self.start_addr + 8 + i * 4)
 
 		addr = self.start_addr + self.bones * 2 + 4
 		i = 0
@@ -48,11 +82,11 @@ class ANIM_0x64(ANIM):
 		return
 
 	def readData(self):
-		self.type = readInt(self.start_addr)
-		self.bones = readInt(self.start_addr+2)
+		self.type = readInt16(self.start_addr)
+		self.bones = readInt16(self.start_addr+2)
 
 		for i in range(self.bones):
-			self.descriptors[i] = readInt(self.start_addr + 4 + i * 4)
+			self.descriptors[i] = readInt16(self.start_addr + 4 + i * 4)
 
 		self.frames = self.start_addr + self.bones * 4 + 4
 
@@ -71,8 +105,8 @@ class MOTA:
 	def __int__(self, start, end):
 		self.start_addr = start
 		self.end_addr = end
-		self.num_of_anims = readInt(start+16)
-		self.endian = "little" if readInt(start+4) == 1 else "big"
+		self.num_of_anims = readInt32(start+16)
+		self.endian = "little" if readInt32(start+4) == 1 else "big"
 		self.headers = [None] * self.num_of_anims
 		self.anims = [None] * self.num_of_anims
 		self.readHeaders()
@@ -81,7 +115,7 @@ class MOTA:
 	def readHeaders(self):
 		start = self.start_addr
 		for i in range(self.num_of_anims):
-			self.headers[i] = readInt(start + 20 + i * 4) + start
+			self.headers[i] = readInt32(start + 20 + i * 4) + start
 		return
 
 	def readAnims(self):
@@ -91,7 +125,7 @@ class MOTA:
 			start = self.headers[i]
 			try: end = self.headers[i+1]
 			except Exception: end = self.end_addr
-			signatureByte = readInt(start)
+			signatureByte = readInt16(start)
 			if signatureByte == 0xC8:
 				self.anim[i] = ANIM_0xC8(start, end)
 				self.anim[i].readData()
