@@ -1,4 +1,5 @@
 import struct
+import os
 
 class BinaryReader:
 	def __init__(self, filepath, OpenFile=False):
@@ -18,6 +19,12 @@ class BinaryReader:
 	def closeFile(self):
 		self.fileIsOpen = False
 		self.fd.close()
+
+	def isOpen(self):
+		return self.fd != None
+
+	def getFileSize(self):
+		return os.path.getsize(self.filepath)
 
 	def __read(self, addr, size, flag, base=0, endian='little'):
 		if self.fd == None: return "FILE NOT OPEN"
@@ -50,14 +57,15 @@ class BinaryReader:
 		# Returning read bytes
 		return bytes
 	
-	def readString(self, addr):
+	def readString(self, addr, offset=0):
 		if self.fd == None: return "FILE NOT OPEN"
-		offset = 0
+		if offset != 0:
+			return self.__readBytes(addr, offset).decode("ascii")
 		while self.__readBytes(addr + offset, 1) != b'\x00':
 			offset += 1
 		return self.__readBytes(addr, offset).decode("ascii")
 
-	def readByte(self, addr, endian='little', base=0): # unsigned byte
+	def readByte(self, addr, endian='little', base=0): # byte
 		return self.__read(addr, 1, 'b', base, endian)
 
 	def readInt8(self, addr, endian='little', base=0):
@@ -66,7 +74,7 @@ class BinaryReader:
 	def readUInt8(self, addr, endian='little', base=0):
 		return self.__read(addr, 1, 'B', base, endian)
 	
-	def readShort(self, addr, endian='little', base=0):	# uint16
+	def readShort(self, addr, endian='little', base=0):	# int16
 		return self.__read(addr, 2, 'h', base, endian)
 
 	def readInt16(self, addr, endian='little', base=0):
@@ -75,13 +83,16 @@ class BinaryReader:
 	def readUInt16(self, addr, endian='little', base=0):
 		return self.__read(addr, 2, 'H', base, endian)
 
+	def readInt(self, addr, endian='little', base=0): # int32
+		return self.__read(addr, 4, 'i', base, endian)
+	
 	def readInt32(self, addr, endian='little', base=0):
 		return self.__read(addr, 4, 'i', base, endian)
 
 	def readUInt32(self, addr, endian='little', base=0):
 		return self.__read(addr, 4, 'I', base, endian)
 
-	def readLong(self, addr, endian='little', base=0): # uint64
+	def readLong(self, addr, endian='little', base=0): # int64
 		return self.__read(addr, 8, 'q', base, endian)
 	
 	def readInt64(self, addr, endian='little', base=0):
