@@ -9,7 +9,9 @@ class BinaryReader:
 			self.openFile()
 
 	def openFile(self):
-		self.fd = open(self.filepath, 'rb')
+		try: self.fd = open(self.filepath, 'rb')
+		except Exception:
+			return
 		if self.fd != None:
 			self.fileIsOpen = True
 
@@ -18,6 +20,7 @@ class BinaryReader:
 		self.fd.close()
 
 	def __read(self, addr, size, flag, base=0, endian='little'):
+		if self.fd == None: return "FILE NOT OPEN"
 		# Storing original position
 		original_position = self.fd.tell()
 		# Setting position to given address
@@ -35,6 +38,7 @@ class BinaryReader:
 		return val
 
 	def __readBytes(self, addr, size):
+		if self.fd == None: return "FILE NOT OPEN"
 		# Storing original position
 		x = self.fd.tell()
 		# Setting position to given address
@@ -47,6 +51,7 @@ class BinaryReader:
 		return bytes
 	
 	def readString(self, addr):
+		if self.fd == None: return "FILE NOT OPEN"
 		offset = 0
 		while self.__readBytes(addr + offset, 1) != b'\x00':
 			offset += 1
@@ -94,7 +99,7 @@ class BinaryReader:
 	# END OF CLASS
 
 # if __name__ == "__main__":
-# 	br = BinaryReader('mota_5.bin', True)
+# 	br = BinaryReader('mota_8.bin', True)
 # 	header = br.readString(0)
 # 	print(header)
 # 	endianInt = br.readUInt32(4)
